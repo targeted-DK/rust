@@ -1,0 +1,151 @@
+1. Donggyu Kim(437008)
+
+2. 
+fn main() {
+    println!("{}", 3+5*1);
+}
+
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustexpressions v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio5/rustexpressions)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.66s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio5/rustexpressions/target/debug/rustexpressions`
+8
+
+Although addition operators comes first, during the compilation, the multiplication operator was given precedence - we know this because the
+above printed 8, not 15.
+
+3. 
+    let a = 5;
+    let b = 13;
+
+    if a < b {
+            println!("{}", a);
+        } else {
+            println!("{}", b);
+        }
+
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustexpressions v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio5/rustexpressions)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.66s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio5/rustexpressions/target/debug/rustexpressions`
+5
+
+
+4. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustexpressions v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio5/rustexpressions)
+error: expected expression, found keyword `else`
+  --> src/main.rs:12:8
+   |
+12 |     }; else {
+   |        ^^^^ expected expression
+
+semi colon indicates the end of expression, but the use of else expression indicates that the use of if else expression has not ended yet, therefore causing error.
+
+
+5. 
+let c = (23, 1);
+
+    match c {
+        (first, second) => println!("{}", if first > second {first} else {second})
+    }
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustexpressions v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio5/rustexpressions)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.70s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio5/rustexpressions/target/debug/rustexpressions`
+23
+
+6. 
+    let mut vec  = Vec::new();
+
+    for i in 0..10 {
+        vec.push(i);
+    }
+
+    println!("{:?}", vec);
+
+[donggyukim@iht32-1506.sif src]$ cargo run
+   Compiling rustexpressions v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio5/rustexpressions)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.43s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio5/rustexpressions/target/debug/rustexpressions`
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+7. 
+[donggyukim@iht32-1503.sif rustexpressions]$ cargo run
+    Finished dev [unoptimized + debuginfo] target(s) in 0.13s
+     Running `target/debug/rustexpressions`
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+[donggyukim@iht32-1503.sif rustexpressions]$ cargo run
+   Compiling rustexpressions v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio5/rustexpressions)
+error[E0382]: borrow of moved value: `vec`
+  --> src/main.rs:38:22
+   |
+28 |     let mut vec  = Vec::new();
+   |         ------- move occurs because `vec` has type `Vec<i32>`, which does not implement the `Copy` trait
+...
+35 |     for val in vec {
+   |                --- `vec` moved due to this implicit call to `.into_iter()`
+...
+38 |     println!("{:?}", vec);
+   |                      ^^^ value borrowed here after move
+   |
+note: `into_iter` takes ownership of the receiver `self`, which moves `vec`
+  --> /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/iter/traits/collect.rs:271:18
+   = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: consider iterating over a slice of the `Vec<i32>`'s content to avoid moving into the `for` loop
+   |
+35 |     for val in &vec {
+
+Ok so it seems like if I put 
+ println!("{:?}", vec); Before
+  for val in vec {,
+  it works! The program prints out entire vector or each element individually successfully. (which made me confused for awhile!!)
+  But when I put  println!("{:?}", vec); after the for loop I get the error above.
+  So when we try to print out elemnts of vector, vector should be a reference because we don't want to move elements of the vector. 
+  
+
+8. 
+//output:
+[donggyukim@iht32-1503.sif rustexpressions]$ cargo run
+   Compiling rustexpressions v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio5/rustexpressions)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.79s
+     Running `target/debug/rustexpressions`
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+//code :
+
+    let mut vec  = Vec::new();
+
+    for i in 0..10 {
+        vec.push(i);
+    }
+    
+    
+    for val in &vec {
+        println!("{}", val);
+    }
+    println!("{:?}", vec);

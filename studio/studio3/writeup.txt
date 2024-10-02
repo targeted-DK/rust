@@ -1,0 +1,137 @@
+1. Donggyu Kim(437008)
+
+2. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustownership v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio3/rustownership)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.68s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio3/rustownership/target/debug/rustownership`
+0
+1
+1
+
+3. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustownership v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio3/rustownership)
+error[E0382]: borrow of moved value: `b`
+  --> src/main.rs:21:20
+   |
+17 |     let b : String = "test2".to_string();
+   |         - move occurs because `b` has type `String`, which does not implement the `Copy` trait
+18 |     let c : String = b;
+   |                      - value moved here
+...
+21 |     println!("{}", b);
+   |                    ^ value borrowed here after move
+   |
+   = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: consider cloning the value if the performance cost is acceptable
+   |
+18 |     let c : String = b.clone();
+   |                       ++++++++
+
+This happens because we already moved the string(which is not primitive data type and which does not implement the copy trait) that originally belonged to variable b to c.
+Nothing is dropped, but b is uninitialized, since rust's move operation 
+involves the transfer of ownership of the string, and a variable that transferred the ownership of a string to the other is no longer used. Therefore, trying to print 
+variable b causes error as shown above. This happens because String contains ptr, len, capacity, not just a value on the stack.
+
+4. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustownership v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio3/rustownership)
+warning: variable does not need to be mutable
+  --> src/main.rs:16:9
+   |
+16 |     let mut b : String = "test2".to_string();
+   |         ----^
+   |         |
+   |         help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` on by default
+
+warning: `rustownership` (bin "rustownership") generated 1 warning (run `cargo fix --bin "rustownership"` to apply 1 suggestion)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.93s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio3/rustownership/target/debug/rustownership`
+test1
+test2
+test3
+
+5.
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustownership v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio3/rustownership)
+error[E0382]: borrow of moved value: `c`
+  --> src/main.rs:27:20
+   |
+17 |     let c : String = "test3".to_string();
+   |         - move occurs because `c` has type `String`, which does not implement the `Copy` trait
+...
+23 |     b = c;
+   |         - value moved here
+...
+27 |     println!("{}", c);
+   |                    ^ value borrowed here after move
+   |
+   = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: consider cloning the value if the performance cost is acceptable
+   |
+23 |     b = c.clone();
+   |          ++++++++
+
+This error happens as variable c is immutable variable and we are trying to modify it by moving it to variable b. The error message tells us to copy(clone) as this variable
+cannot be modified. 
+
+6.
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustownership v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio3/rustownership)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.81s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio3/rustownership/target/debug/rustownership`
+test1
+test2
+test3
+test1
+test3
+test4
+
+7. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustownership v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio3/rustownership)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.92s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio3/rustownership/target/debug/rustownership`
+test1
+test2
+test3
+test1
+test3
+test4
+["test1", "test3", "test4"]
+
+8. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustownership v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio3/rustownership)
+error[E0507]: cannot move out of index of `Vec<String>`
+  --> src/main.rs:38:13
+   |
+38 |     let d = vec[vec.len() - 1];
+   |             ^^^^^^^^^^^^^^^^^^ move occurs because value has type `String`, which does not implement the `Copy` trait
+   |
+help: consider borrowing here
+   |
+38 |     let d = &vec[vec.len() - 1];
+   |             +
+
+
+Moving element directly from the vector to variable d leaves a hole in the vector - we should use other methods that safely pops the value from this vector or use clone()
+to copy the string in that index.
+
+9.
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustownership v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio3/rustownership)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.10s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio3/rustownership/target/debug/rustownership`
+test1
+test2
+test3
+test1
+test3
+test4
+["test1", "test3", "test4"]
+test4
+

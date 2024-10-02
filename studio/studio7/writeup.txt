@@ -1,0 +1,240 @@
+1. Donggyu Kim(437008)
+
+2.
+//code
+pub const A : usize = 1;
+
+fn main() {
+    println!("{}", A);
+}
+
+//output
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio7/rustmodules)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.67s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio7/rustmodules/target/debug/rustmodules`
+1
+
+3.
+//code
+pub static A : usize = 1;
+
+fn main() {
+
+    println!("{}", A);
+}
+
+//output
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio7/rustmodules)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.67s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio7/rustmodules/target/debug/rustmodules`
+1
+
+4. 
+1
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio7/rustmodules)
+error[E0133]: use of mutable static is unsafe and requires unsafe function or block
+  --> src/main.rs:13:20
+   |
+13 |     println!("{}", A);
+   |                    ^ use of mutable static
+   |
+   = note: mutable statics can be mutated by multiple threads: aliasing violations or data races will cause undefined behavior
+   = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+For more information about this error, try `rustc --explain E0133`.
+error: could not compile `rustmodules` (bin "rustmodules") due to previous error
+
+5.
+//code
+pub static mut A : usize = 1;
+
+fn main() {
+    unsafe {
+    println!("{}", A);
+    }
+}
+
+
+//output
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio7/rustmodules)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.71s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio7/rustmodules/target/debug/rustmodules`
+1
+
+6.
+//code
+use std::sync::atomic::{AtomicUsize, Ordering};
+pub static B : AtomicUsize = AtomicUsize::new(2);
+
+fn main() {
+
+    println!("{}",  B.load(Ordering::SeqCst));
+
+    //reference : https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html, BOT p.537
+    B.store(3, Ordering::SeqCst);
+    println!("After stroing new value : {}",  B.load(Ordering::SeqCst))
+}
+
+//output
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio7/rustmodules)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.77s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio7/rustmodules/target/debug/rustmodules`
+2
+After stroing new value : 3
+
+7. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio7/rustmodules)
+error[E0601]: `main` function not found in crate `rustmodules`
+  --> src/main.rs:31:2
+   |
+31 | }
+   |  ^ the main function must be defined at the crate level (in `src/main.rs`)
+   |
+note: here is a function named `main`
+  --> src/main.rs:6:1
+   |
+6  | fn main() {
+   | ^^^^^^^^^
+   = note: you have one or more functions named `main` not defined at the crate level
+   = help: consider moving the `main` function definitions
+
+For more information about this error, try `rustc --explain E0601`.
+error: could not compile `rustmodules` (bin "rustmodules") due to previous error
+
+
+
+8. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio7/rustmodules)
+error[E0425]: cannot find value `B` in this scope
+  --> src/main.rs:27:21
+   |
+27 |     println!("{}",  B.load(Ordering::SeqCst));
+   |                     ^ not found in this scope
+   |
+help: consider importing this static
+   |
+1  + use crate::rustmod::B;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Ordering`
+  --> src/main.rs:27:28
+   |
+27 |     println!("{}",  B.load(Ordering::SeqCst));
+   |                            ^^^^^^^^ use of undeclared type `Ordering`
+   |
+help: consider importing one of these items
+   |
+1  + use core::cmp::Ordering;
+   |
+1  + use core::sync::atomic::Ordering;
+   |
+1  + use std::cmp::Ordering;
+   |
+1  + use std::sync::atomic::Ordering;
+   |
+
+error[E0425]: cannot find value `B` in this scope
+  --> src/main.rs:29:5
+   |
+29 |     B.store(3, Ordering::SeqCst);
+   |     ^ not found in this scope
+   |
+help: consider importing this static
+   |
+1  + use crate::rustmod::B;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Ordering`
+  --> src/main.rs:29:16
+   |
+29 |     B.store(3, Ordering::SeqCst);
+   |                ^^^^^^^^ use of undeclared type `Ordering`
+   |
+help: consider importing one of these items
+   |
+1  + use core::cmp::Ordering;
+   |
+1  + use core::sync::atomic::Ordering;
+   |
+1  + use std::cmp::Ordering;
+   |
+1  + use std::sync::atomic::Ordering;
+   |
+
+error[E0425]: cannot find value `B` in this scope
+  --> src/main.rs:31:47
+   |
+31 |     println!("After stroing new value : {}",  B.load(Ordering::SeqCst))
+   |                                               ^ not found in this scope
+   |
+help: consider importing this static
+   |
+1  + use crate::rustmod::B;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Ordering`
+  --> src/main.rs:31:54
+   |
+31 |     println!("After stroing new value : {}",  B.load(Ordering::SeqCst))
+   |                                                      ^^^^^^^^ use of undeclared type `Ordering`
+   |
+help: consider importing one of these items
+   |
+1  + use core::cmp::Ordering;
+   |
+1  + use core::sync::atomic::Ordering;
+   |
+1  + use std::cmp::Ordering;
+   |
+1  + use std::sync::atomic::Ordering;
+   |
+
+warning: unused import: `Ordering`
+ --> src/main.rs:3:38
+  |
+3 | use std::sync::atomic::{AtomicUsize, Ordering};
+  |                                      ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+Some errors have detailed explanations: E0425, E0433.
+For more information about an error, try `rustc --explain E0425`.
+warning: `rustmodules` (bin "rustmodules") generated 1 warning
+error: could not compile `rustmodules` (bin "rustmodules") due to 6 previous errors; 1 warning emitted
+
+
+9.
+//code
+mod rustmod {
+    
+use std::sync::atomic::AtomicUsize;
+pub static B : AtomicUsize = AtomicUsize::new(2);
+
+}
+
+fn main() {
+    pub use rustmod::B;
+    pub use std::sync::atomic::Ordering;
+   
+    println!("{}",  B.load(Ordering::SeqCst));
+    //reference : https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html
+    B.store(3, Ordering::SeqCst);
+
+    println!("After stroing new value : {}",  B.load(Ordering::SeqCst))
+    
+}
+
+//output
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio7/rustmodules)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.71s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio7/rustmodules/target/debug/rustmodules`
+2
+After stroing new value : 3

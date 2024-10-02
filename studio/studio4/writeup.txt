@@ -1,0 +1,107 @@
+1. Donggyu Kim(437008)
+
+2. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio4/rustreferences)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.66s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio4/rustreferences/target/debug/rustreferences`
+0
+0
+0
+
+3.
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio4/rustreferences)
+error[E0277]: can't compare `{integer}` with `&{integer}`
+  --> src/main.rs:11:14
+   |
+11 |     let d = b==c;
+   |              ^^ no implementation for `{integer} == &{integer}`
+   |
+
+Two variables, b and c, although they seem to refer to variable a, b is a reference to a(&a) and c is reference to reference to a(&&a). The operands of a compmarison must have
+exactly the same type, including the references. (BOT p.108), unless used with dereferencing.
+
+4. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio4/rustreferences)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.74s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio4/rustreferences/target/debug/rustreferences`
+0
+0
+0
+true
+
+5. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio4/rustreferences)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.80s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio4/rustreferences/target/debug/rustreferences`
+0
+0
+0
+true
+
+Like #4, variable d prints true in this case as well.
+Code for #4 was, 
+let d = b==*c;
+Code for #5 was, 
+let d = *b == **c;
+
+They both return true because #4 is both reference to variable a, and #5 is both value of variable a.
+
+6. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio4/rustreferences)
+error[E0506]: cannot assign to `a` because it is borrowed
+  --> src/main.rs:22:9
+   |
+18 |         let b = &a;
+   |                 -- `a` is borrowed here
+...
+22 |         a = 1;
+   |         ^^^^^ `a` is assigned to here but it was already borrowed
+23 |         println!("a: {}", a);
+24 |         println!("b: {}", b);
+   |                           - borrow later used here
+
+The problem is when we tried to assign different value to variable a, already we made a reference variable. We cannot modify the value of variable a because 
+we made some variable b, which is reference to variable a. We say that the reference's lifetime must contain or enclose the variable's.(BOT p.112).
+Therefore, changing the value of variable a does not work because we already have some variable b that is borrowing the initial value of variable a. 
+
+7. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio4/rustreferences)
+error[E0308]: mismatched types
+  --> src/main.rs:22:13
+   |
+18 |         let mut b = &a;
+   |                     -- expected due to this value
+...
+22 |         b = 2;
+   |             ^ expected `&{integer}`, found integer
+   |
+help: consider borrowing here
+   |
+22 |         b = &2;
+
+Since b is a reference type, when reassigning a value to b, it needs to be a reference to a value as well.
+Therefore, it should be b = &2, not b = 2;
+
+8.
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio4/rustreferences)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.68s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio4/rustreferences/target/debug/rustreferences`
+b before: 0
+b after: 2
+
+9.
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio4/rustreferences)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.82s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio4/rustreferences/target/debug/rustreferences`
+b before : test
+b after : test2
+
+

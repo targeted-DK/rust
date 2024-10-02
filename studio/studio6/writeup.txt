@@ -1,0 +1,158 @@
+1. Donggyu Kim(437008)
+
+2. 
+fn main() {
+    let a = 15;
+    let b = 5;
+    let c = 5;
+
+    let ans = a / (b-c);
+
+    println!("{}", ans);
+}
+
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors)
+error: this operation will panic at runtime
+ --> src/main.rs:6:15
+  |
+6 |     let ans = a / (b-c);
+  |               ^^^^^^^^^ attempt to divide `15_i32` by zero
+  |
+  = note: `#[deny(unconditional_panic)]` on by default
+
+error: could not compile `rusterrors` (bin "rusterrors") due to previous error
+
+The compiler throws 'unconditional_panic', meaning that it just aborted whole program right away.
+
+3. 
+fn main() {
+   
+    let a: u8 = 15;
+    let b : u8= 5;
+    let c : u8= 5;
+
+    divide_by_zero(&a,&b,&c);
+}
+
+fn divide_by_zero( a : &u8,  b : &u8,  c : &u8) -> u8{
+
+    return a / (b-c);
+}
+
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.67s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors/target/debug/rusterrors`
+thread 'main' panicked at 'attempt to divide by zero', /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/ops/arith.rs:484:1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+The divide by zero operation was handled by panic and than 'RUST_BACKTRACE' environment variable was printed which suggests that Rust will dump stack at this point.
+This stack is unwound, and any objects uses in this current function is dropped in the reverse order.(cleaning up). Then the thread exits. (BOT p.159)
+Panic is a safe way for program to handle errors in Rust. 
+
+4.
+[donggyukim@iht32-1501.sif src]$ export RUST_BACKTRACE=1
+[donggyukim@iht32-1501.sif src]$ echo $RUST_BACKTRACE
+1
+[donggyukim@iht32-1501.sif src]$ cargo run
+    Finished dev [unoptimized + debuginfo] target(s) in 0.04s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors/target/debug/rusterrors`
+thread 'main' panicked at 'attempt to divide by zero', /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/ops/arith.rs:484:1
+stack backtrace:
+   0: rust_begin_unwind
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/std/src/panicking.rs:593:5
+   1: core::panicking::panic_fmt
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/panicking.rs:67:14
+   2: core::panicking::panic
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/panicking.rs:117:5
+   3: <u8 as core::ops::arith::Div>::div
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/ops/arith.rs:484:1
+   4: <&u8 as core::ops::arith::Div<u8>>::div
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/internal_macros.rs:35:17
+   5: rusterrors::divide_by_zero
+             at ./main.rs:25:12
+   6: rusterrors::main
+             at ./main.rs:15:5
+   7: core::ops::function::FnOnce::call_once
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/ops/function.rs:250:5
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+5. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.70s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors/target/debug/rusterrors`
+15
+
+
+6. 
+//divide by zero
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.65s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors/target/debug/rusterrors`
+thread 'main' panicked at 'attempt to divide by zero', /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/ops/arith.rs:484:1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+//not divide by zero 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.66s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors/target/debug/rusterrors`
+15
+
+
+7. 
+//success
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.72s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors/target/debug/rusterrors`
+Ok: 15
+
+//error handled without panic
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.66s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio6/rusterrors/target/debug/rusterrors`
+Divide by zero Error: 1
+
+
+//code
+fn main() {
+   
+    let a: isize = 15;
+        let b : isize= 5;
+        let c : isize= 5;
+
+
+    #[cfg(oldexercise2)] { 
+        let ans = a / (b-c);
+        println!("{}", ans);
+    }
+
+    let nom = a;
+    let denom = b - c;
+
+    match divide_by_zero(&nom, &denom){
+        Ok(ans) => {
+            println!("Ok: {}", ans);
+            return ()
+        },
+        Err(e) => {
+            println!("Divide by zero Error: {}", e);
+        }
+    }
+
+}
+
+fn divide_by_zero( nom : &isize,  denom : &isize) -> Result<isize, isize>{
+
+    if *denom == 0{
+        return Err(1);
+    } else {
+        Ok(nom/denom)
+    }
+}
+

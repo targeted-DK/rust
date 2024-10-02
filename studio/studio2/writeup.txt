@@ -1,0 +1,116 @@
+1. Donggyu Kim(437008)
+
+2.[donggyukim@iht32-1506.sif src]$ cargo run
+   Compiling rusttypes v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio2/rusttypes)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.93s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio2/rusttypes/target/debug/rusttypes`
+1
+2
+3
+...
+254
+255
+thread 'main' panicked at 'attempt to add with overflow', src/main.rs:6:9
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+3. 
+[donggyukim@iht32-1501.sif src]$ cargo run
+   Compiling rusttypes v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio2/rusttypes)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.67s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio2/rusttypes/target/debug/rusttypes`
+2
+4
+8
+16
+32
+64
+128
+
+4. 
+[donggyukim@iht32-1501.sif debug]$ cargo run
+   Compiling rusttypes v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio2/rusttypes)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.77s
+     Running `./rusttypes`
+count : 1
+a : 2
+count : 2
+a : 4
+count : 3
+a : 8
+count : 4
+a : 16
+count : 5
+a : 32
+count : 6
+a : 64
+count : 7
+a : 128
+
+a.overflowing_mul(u8) returns a tuple of two values : (u32, bool) and .1 returns boolean value whether the function overflows or not
+
+5. 
+[donggyukim@iht32-1501.sif debug]$ cargo run
+   Compiling rusttypes v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio2/rusttypes)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.76s
+     Running `./rusttypes`
+count : 1
+a : 2
+count : 2
+a : 4
+count : 3
+a : 8
+count : 4
+a : 16
+count : 5
+a : 32
+count : 6
+a : 64
+count : 7
+a : 128
+count : 8
+a : 255
+
+6.
+[donggyukim@iht32-1501.sif debug]$ cargo run
+   Compiling rusttypes v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio2/rusttypes)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.79s
+     Running `./rusttypes`
+count : 1
+a : 2
+count : 2
+a : 4
+count : 3
+a : 8
+count : 4
+a : 16
+count : 5
+a : 32
+count : 6
+a : 64
+count : 7
+a : 128
+count : 8
+a : 0
+
+7.
+[donggyukim@iht32-1501.sif debug]$ cargo run
+   Compiling rusttypes v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio2/rusttypes)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.00s
+     Running `./rusttypes`
+count : 1
+a : 2
+count : 2
+a : 4
+count : 3
+a : 8
+count : 4
+a : 16
+count : 5
+a : 32
+count : 6
+a : 64
+count : 7
+a : 128
+count : 8
+a : 0
+[0, 1, 2, 4, 8, 16, 32, 64, 128]
