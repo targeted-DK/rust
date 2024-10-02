@@ -1,0 +1,102 @@
+1. Donggyu Kim(DK)
+
+2. 
+Code :
+struct Car {
+    name : String,
+    x : isize,
+    y : isize,
+}
+
+impl Car {
+    fn new() -> Car  {
+        Car {
+        name : "Lightning".to_string(),
+        x : 0,
+        y : 0,
+        }
+    }
+}
+fn main() {
+    let test = Car::new();
+    println!("{},{},{}", test.name, test.x, test.y);
+}
+
+
+Output:
+Lightning,0,0
+
+3.
+Code :
+impl fmt::Display for Locations {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Locations::North => write!(f, "North"),
+            Locations::East => write!(f, "East"),
+            Locations::South => write!(f, "South"),
+            Locations::West => write!(f, "West"),
+        }
+    }
+}
+
+
+fn main() {
+    let test = Car::new();
+    println!("{},{},{},{}", test.name, test.x, test.y, test.location.to_string());
+}
+
+
+Output :
+Lightning,0,0,North
+
+4.
+Lightning,0,0,North
+Lightning,0,1,North
+
+
+5.
+Lightning,0,0,North
+Lightning,0,1,North
+Lightning,0,1,West
+
+
+6.
+code :
+
+fn figure_eight<T: Mover + Turner + std::fmt::Debug> (c: &mut T){
+    c.advance();
+    println!("{:?}", c);
+    c.turn(Rotations::Left);
+    c.advance();
+    println!("{:?}", c);
+    c.turn(Rotations::Left);
+    c.advance();
+    println!("{:?}", c);
+    c.turn(Rotations::Left);
+    c.advance();
+    println!("{:?}", c);
+    c.advance();
+    println!("{:?}", c);
+    c.turn(Rotations::Right);
+    c.advance();
+    println!("{:?}", c);
+    c.turn(Rotations::Right);
+    c.advance();
+    println!("{:?}", c);
+    c.turn(Rotations::Right);
+    c.advance();
+    println!("{:?}", c);
+
+
+}
+
+
+output:
+Car { name: "Lightning", x: 0, y: 1, location: North }
+Car { name: "Lightning", x: -1, y: 1, location: West }
+Car { name: "Lightning", x: -1, y: 0, location: South }
+Car { name: "Lightning", x: 0, y: 0, location: East }
+Car { name: "Lightning", x: 1, y: 0, location: East }
+Car { name: "Lightning", x: 1, y: -1, location: South }
+Car { name: "Lightning", x: 0, y: -1, location: West }
+Car { name: "Lightning", x: 0, y: 0, location: North }
