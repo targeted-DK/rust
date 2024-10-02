@@ -1,0 +1,173 @@
+1. Donggyu Kim(437008)
+
+2. 
+//code
+struct Point {
+    a : f64,
+    b : f64
+}
+
+fn main() {
+    let p = Point {
+        a : 10.0,
+        b : 20.0
+    };
+
+    print!("p is (");
+    print!("{}," , p.a);
+    println!("{})" , p.b);
+}
+
+
+//output
+[donggyukim@iht32-1506.sif ruststructs]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio8/ruststructs)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.90s
+     Running `target/debug/ruststructs`
+p is (10,20)
+
+
+3. 
+[donggyukim@iht32-1506.sif src]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio8/ruststructs)
+error[E0277]: `Point` doesn't implement `Debug`
+  --> src/main.rs:16:22
+   |
+16 |     println!("{:?}", p)
+   |                      ^ `Point` cannot be formatted using `{:?}`
+   |
+   = help: the trait `Debug` is not implemented for `Point`
+   = note: add `#[derive(Debug)]` to `Point` or manually `impl Debug for Point`
+   = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: consider annotating `Point` with `#[derive(Debug)]`
+   |
+1  + #[derive(Debug)]
+2  | struct Point {
+   |
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `ruststructs` (bin "ruststructs") due to previous error
+
+
+4. 
+[donggyukim@iht32-1506.sif src]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio8/ruststructs)
+warning: fields `a` and `b` are never read
+ --> src/main.rs:3:5
+  |
+2 | struct Point {
+  |        ----- fields in this struct
+3 |     a : f64,
+  |     ^
+4 |     b : f64
+  |     ^
+  |
+  = note: `Point` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `ruststructs` (bin "ruststructs") generated 1 warning
+    Finished dev [unoptimized + debuginfo] target(s) in 0.95s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio8/ruststructs/target/debug/ruststructs`
+Point { a: 10.0, b: 20.0 }
+
+
+
+5.
+[donggyukim@iht32-1506.sif src]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio8/ruststructs)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.94s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio8/ruststructs/target/debug/ruststructs`
+Point { a: 10.0, b: 20.0 }
+Values modified
+Point { a: 100.0, b: 200.0 }
+
+
+
+6. 
+[donggyukim@iht32-1506.sif src]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio8/ruststructs)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.87s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio8/ruststructs/target/debug/ruststructs`
+Point { a: 100.0, b: 200.0 }
+Values modified
+Point { a: 0.0, b: 0.0 }
+
+
+7.
+//code
+//reference : https://doc.rust-lang.org/book/ch10-01-syntax.html#:~:text=The%20syntax%20for%20using%20generics,otherwise%20specify%20concrete%20data%20types.
+#[derive(Debug)]
+struct Point<T> {
+    a : T,
+    b : T
+}
+
+impl<T> Point<T> {
+    pub fn new(x : T, y: T) -> Point<T> {
+        Point { a : x, b : y}
+    }
+}
+
+fn main() {
+    let mut p = Point {
+        a : 10.0,
+        b : 20.0
+    };
+
+    p.a = 100.0;
+    p.b = 200.0;
+    
+    println!("{:?}", p);
+    p = Point::new(1000.0, 2000.0);
+    println!("Values modified");
+    println!("{:?}", p);
+
+}
+
+//output
+[donggyukim@iht32-1506.sif src]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio8/ruststructs)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.98s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio8/ruststructs/target/debug/ruststructs`
+Point { a: 100.0, b: 200.0 }
+Values modified
+Point { a: 1000.0, b: 2000.0 }
+
+
+8.
+//output[donggyukim@iht32-1503.sif ruststructs]$ cargo run
+     Finished dev [unoptimized + debuginfo] target(s) in 0.93s
+     Running `target/debug/ruststructs`
+Point { a: 10, b: 20 }
+Values modified
+Point { a: 1000, b: 2000 }
+
+
+code :
+   
+    let mut test = Point::new(10, 20); 
+    println!("{:?}", test);
+    test.a = 1000;
+    test.b = 2000;
+    println!("Values modified");
+    println!("{:?}", test);
+
+
+9.
+output :
+[donggyukim@iht32-1503.sif ruststructs]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio8/ruststructs)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.14s
+     Running `target/debug/ruststructs`
+Point { a: 10, b: 20 }
+Values modified
+Point { a: 1000, b: 2000 }
+
+code added :
+pub fn set(&mut self, x: T, y: T) {
+        self.a = x;
+        self.b = y;
+    }
+
+Dead code warning does not occur because we used the function implemented for the Point struct.
+I don't think, for this case, it matters whether we directly modify values or use a method that access them./

@@ -1,0 +1,114 @@
+1. Donggyu Kim
+
+2.
+error[E0004]: non-exhaustive patterns: `_` not covered
+ --> src/main.rs:7:11
+  |
+7 |     match a  {0 => {
+  |           ^ pattern `_` not covered
+  |
+  = note: the matched value is of type `usize`
+  = note: `usize` does not have a fixed maximum value, so a wildcard `_` is necessary to match exhaustively
+help: ensure that all possible cases are being handled by adding a match arm with a wildcard pattern or an explicit pattern as shown
+  |
+9 ~         },
+10+     _ => todo!()
+
+
+
+3. 
+Before:
+   Compiling rustenumspatterns v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio9/rustenumspatterns)
+warning: unreachable pattern
+  --> src/main.rs:11:9
+   |
+8  |         _ =>{
+   |         - matches any value
+...
+11 |         0 => {
+   |         ^ unreachable pattern
+   |
+   = note: `#[warn(unreachable_patterns)]` on by default
+
+
+After:
+matched 0
+
+4. 
+   Compiling rustenumspatterns v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio9/rustenumspatterns)
+warning: unreachable pattern
+  --> src/main.rs:24:9
+   |
+19 |         (pre, suf) => {
+   |         ---------- matches any value
+...
+24 |         _ =>{
+   |         ^ unreachable pattern
+   |
+   = note: `#[warn(unreachable_patterns)]` on by default
+
+warning: `rustenumspatterns` (bin "rustenumspatterns") generated 1 warning
+    Finished dev [unoptimized + debuginfo] target(s) in 0.87s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio9/rustenumspatterns/target/debug/rustenumspatterns`
+matched (test, 2024)
+
+
+5. 
+ Compiling rustenumspatterns v0.1.0 (/home/warehouse/donggyukim/cse542/studio/studio9/rustenumspatterns)
+warning: unreachable pattern
+  --> src/main.rs:24:9
+   |
+19 |         (name, number) => {
+   |         -------------- matches any value
+...
+24 |         (name, number) =>{
+   |         ^^^^^^^^^^^^^^ unreachable pattern
+   |
+   = note: `#[warn(unreachable_patterns)]` on by default
+
+warning: unused variable: `name`
+  --> src/main.rs:24:10
+   |
+24 |         (name, number) =>{
+   |          ^^^^ help: if this is intentional, prefix it with an underscore: `_name`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `number`
+  --> src/main.rs:24:16
+   |
+24 |         (name, number) =>{
+   |                ^^^^^^ help: if this is intentional, prefix it with an underscore: `_number`
+
+warning: `rustenumspatterns` (bin "rustenumspatterns") generated 3 warnings (run `cargo fix --bin "rustenumspatterns"` to apply 2 suggestions)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.08s
+     Running `/home/warehouse/donggyukim/cse542/studio/studio9/rustenumspatterns/target/debug/rustenumspatterns`
+matched (test2, 2024)
+
+The first value in the tuple changed because the values I used to initialized the tuple has changed as well.
+
+6. 
+matched (test2, 2024)
+
+Matches are exhaustive, so therefore we must deal with every possible cases of enum type of data type. Since the tuple two variables,
+a single case (_,_) takes care of all cases.
+
+
+7. 
+case "hello"
+The variable did not represent  a valid integer : invalid digit found in string
+
+case 31
+The variable represented a valid integer : 31
+
+
+8.
+use std::str::FromStr;
+let b = "31";
+
+    if let  Ok(val) = u8::from_str(&b) {
+            println!("The variable represented a valid integer : {}", val);
+    }
+    else {
+            println!("The variable did not represent a valid integer : {}", b);
+    }
