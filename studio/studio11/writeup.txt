@@ -1,0 +1,54 @@
+1. Donggyu Kim(DK)
+
+2. 
+Car { name: "Lightning", x: 0, y: 0, location: North }
+
+
+3.
+Implementation for Position:
+impl Position {
+    fn new(x: isize, y: isize) -> Position {
+        Position {x,y}
+    }
+}
+
+output:
+Car { name: "Lightning", pos: Position { x: 3, y: 4 }, location: North }
+
+4.
+
+impl AddAssign for Position {
+    //reference : https://doc.rust-lang.org/std/ops/trait.AddAssign.html
+    fn add_assign(&mut self, other:Self){
+
+        *self = Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        };
+    }
+
+}
+
+
+5.
+output :
+Car { name: "Lightning", pos: Position { x: 3, y: 4 }, location: North }
+Car { name: "Lightning", pos: Position { x: 2, y: 9 }, location: North }
+
+The output is correct because it modifies value (x,y) based on current location and a parameter provided to self.advance() in main.
+
+6.
+code :
+impl SubAssign for Position {
+    fn sub_assign(&mut self, other:Self){
+        *self = Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+        };
+    }
+}
+
+output:
+Car { name: "Lightning", pos: Position { x: 3, y: 4 }, location: North }
+Car { name: "Lightning", pos: Position { x: 2, y: 9 }, location: North }
+Car { name: "Lightning", pos: Position { x: 0, y: 0 }, location: North }
