@@ -1,0 +1,64 @@
+1. Donggyu Kim(DK) 437008
+
+2.
+Code :
+fn main() {
+    let a : String = String::from("Thanks, Rosencrantz and gentle Guildenstern.");
+
+    let result: Vec<String> = a.split_whitespace().map(str::to_string).collect();
+    println!("{:?}", result);
+
+}
+
+
+Output :
+["Thanks,", "Rosencrantz", "and", "gentle", "Guildenstern."]
+
+3.
+Output:
+{"Guildenstern.", "Rosencrantz", "Thanks,", "and", "gentle"}
+
+Reason :
+BTreeSet stores values as keys, so the set itself as a dictionary, rather than a vector. Also BTreeSet stores values based on order used in BTree. So the order of each element is different from that of a vector.
+
+4. 
+Output :
+{"Thanks,", "and", "Rosencrantz", "Guildenstern.", "gentle"}
+
+Reason : HashSet is unordered by nature, so added elements are not sorted. This is true because if you run the code again, formatted printing of HashSet differs every run.
+
+5. 
+Output :
+Vector : ["She", "sells", "sea", "shells", "by", "the", "sea", "shore."]
+BTreeSet : {"She", "by", "sea", "sells", "shells", "shore.", "the"}
+HashSet : {"She", "shells", "by", "the", "shore.", "sea", "sells"}
+
+Reason :
+BTreeSet and HashSet does not allow duplicates by nature (since they are key or hash based)
+
+6.
+Output:
+BTreeMap : {0: "She", 1: "sells", 2: "sea", 3: "shells", 4: "by", 5: "the", 6: "sea", 7: "shore."}
+
+It's most similar to vector, as it uses key to sort elements in the map.
+
+
+7.
+Output:
+BTreeMap : {"She": 0, "by": 4, "sea": 6, "sells": 1, "shells": 3, "shore.": 7, "the": 5}
+
+BTreeSet has similar output to this, because key of BTreeMap is hashed, like each elements in BTreeSet.
+
+8.
+My code seems to run well even without .clone() method. Here is my declaration of and how I how pushed each string into the map.
+
+    let b :  String = String::from("She sells sea shells by the sea shore.");
+    
+    let mut d : BTreeMap<String, usize> = BTreeMap::new();
+
+    for (i, item) in b.split_whitespace().map(str::to_string).collect::<Vec<_>>().iter().enumerate() {
+        d.insert(item.to_string(),i);
+    }
+    println!("BTreeMap : {:?}", d);
+
+

@@ -1,0 +1,83 @@
+1. Donggyu Kim(DK)
+
+2. 
+Code : 
+#[derive(Debug)]
+struct Test {
+    value : String,
+}
+
+impl Test {
+    fn new(input : &String) -> Test {
+        Test{
+            value : input.to_string(),
+        }
+    }
+}
+
+fn main() {
+    let a = Test::new(&String::from("a"));
+    let b = Test::new(&String::from("b"));
+
+    println!{"{:?}", a};
+    println!{"{:?}", b};
+
+}
+
+
+output : 
+Test { value: "a" }
+Test { value: "b" }
+
+
+3. 
+Code :
+
+impl Drop for Test {
+    fn drop(&mut self){
+        print!("Dropping {}", self.value);
+        if !self.value.is_empty() {
+            self.value = "".to_string();
+        };
+        println!("")
+    }
+}
+
+Output :
+Test { value: "a" }
+Test { value: "b" }
+Dropping b
+Dropping a
+
+Drop works as a destructor in C++. When declared variables gets cleaned up, the program frees buffers holding in the heap-allocated buffer, destructing the latest variable first.
+
+4. 
+Output:
+a
+b
+
+Changes made :
+In order to print values of generic struct, I had to create separate method that prints out the field variable, because Generic type T does not have implementations to print out its value.
+Also, I had to add traits like Display + Copy to make it work since Generic traits needs to have certain traits to be used.
+
+5.
+Output:
+Two values of this struct is : a, 65535
+Two values of this struct is : b, 0
+Struct dropped
+Struct dropped
+
+6. 
+
+Two values of this struct is : , 15
+Two values of this struct is : b, 0
+
+
+7. 
+Output:
+Two values of this struct is : , 15
+Two values of this struct is : b, 0
+Struct dropped
+Struct dropped
+
+Error did not happen....? I am not sure if i am suppose to expect to have an error when I initialize the struct with Default object when drop method is commented out. 

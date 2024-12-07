@@ -1,0 +1,130 @@
+1. Donggyu Kim(DK)
+
+2. 
+use std::env;
+
+fn main() {
+
+    let count = env::args().collect::<Vec<_>>().len();
+
+    
+    for arg in env::args().collect::<Vec<_>>(){
+        println!("This program's name is {}", arg);
+    }
+   
+}
+
+
+Output 1:
+This program's name is ./rustmacros
+
+Output 2: 
+This program's name is ./rustmacros
+This program's name is with
+This program's name is extraargs
+
+3. 
+Code:
+use std::env;
+
+fn main() {
+
+    let count = env::args().collect::<Vec<_>>().len();
+    
+    for arg in env::args().collect::<Vec<_>>(){
+        println!("This program's name is {}", arg);
+    }
+   
+    check_cmd_line!();
+}
+
+#[macro_export]
+macro_rules! check_cmd_line {
+    () =>{};
+}
+
+4.
+Code :
+pub static MY_ATOMIC_BOOL: AtomicBool = AtomicBool::new(true);
+
+check_cmd_line!((atomic_true, count), 1);
+
+
+#[macro_export]
+macro_rules! check_cmd_line {
+    ($left:expr, $right:expr) =>{
+        match (&$left, &$right) {
+            ((left_bool, left_val), right_val) => {
+                
+                    if *left_val != *right_val {
+                        panic!(
+                            "assertion failed: `(left == right)` (left: `{:?}`, right: `{:?}`)",
+                            left_val, right_val
+                        );
+                    }
+
+                if left_bool.load(Ordering::SeqCst) {
+                    println!("boolean value is set to true");
+                } else {
+                    println!("boolean value is set to false");
+                } 
+            }
+        }
+    };
+}
+
+5. 
+[donggyukim@iht32-1506.sif debug]$ ./rustmacros test
+This program's name is ./rustmacros
+This program's name is test
+thread 'main' panicked at 'assertion failed: `(left == right)` (left: `2`, right: `1`)', src/main.rs:16:5
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+6. 
+Code:
+
+
+fn main() {
+    check_cmd_line!();
+    check_cmd_line!(false);
+    check_cmd_line!();   
+}
+
+pub static MY_ATOMIC_BOOL: AtomicBool = AtomicBool::new(true);
+
+#[macro_export]
+macro_rules! check_cmd_line {
+    () => {
+        if !MY_ATOMIC_BOOL.load(Ordering::SeqCst) {
+            println!("provide either false or true");
+            MY_ATOMIC_BOOL.store(true, Ordering::SeqCst); 
+        }
+    };
+    
+    (true) => {
+        MY_ATOMIC_BOOL.store(true, Ordering::SeqCst);
+    };
+  
+    (false) => {
+        MY_ATOMIC_BOOL.store(false, Ordering::SeqCst);
+    };
+    ($left:expr, $right:expr) =>{
+        match (&$left, &$right) {
+           
+            ((left_bool, left_val), right_val) => {
+                
+                    if *left_val != *right_val {
+                        panic!(
+                            "assertion failed: `(left == right)` (left: `{:?}`, right: `{:?}`)",
+                            left_val, right_val
+                        );
+                    }
+
+                if left_bool.load(Ordering::SeqCst) {
+                    println!("boolean value is set to true");
+                } else {
+                    println!("boolean value is set to false");
+                } 
+        }
+    };
+}

@@ -1,0 +1,105 @@
+1. Donggyu Kim(437008)
+
+2.
+Test , false , [1, 2, 3, 4]
+
+3.
+Code:
+use std::io::Write;
+
+fn main() {
+   let a  = "Test";
+   let b = false;
+   let c = vec![1,2,3,4];
+
+   println!("{} , {} , {:?}", a, b, c);
+
+   let mut writer = std::io::stdout().lock();
+   writeln!(&mut writer,"{} , {} , {:?}", a, b, c).unwrap();
+  
+
+}
+
+Output : 
+Test , false , [1, 2, 3, 4]
+
+
+4. 
+Output:
+Done
+
+Code:
+use std::io::Write;
+
+fn main() {
+   let a  = "Test";
+   let b = false;
+   let c = vec![1,2,3,4];
+
+   let mut writer = std::io::stdout().lock();
+    let result = writeln!(&mut writer,"{} , {} , {:?}", a, b, c);
+    match result {
+        Ok(_) => println!("Done"),
+        Err(..) => println!("Error")
+    }
+
+}
+
+5.
+arg : Cargo.toml
+[package]
+name = "rustio"
+version = "0.1.0"
+edition = "2021"
+
+arg : ../Cargo.toml
+Reading file: ../Cargo.toml
+No such file or directory (os error 2)
+
+6.
+Output:
+Reading file: Cargo.toml
+[package]
+name = "rustio"
+version = "0.1.0"
+edition = "2021"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+
+Code :
+use std::io::Write;
+use std::env;
+use std::io::BufReader;
+use std::fs::File;
+use std::io::BufRead;
+fn main() {
+
+    let arg : Vec<_> = env::args().collect();
+   
+    match arg.get(1) {
+
+        Some(name) => {
+            println!("Reading file: {}", name);
+            
+            match File::open(name) {
+                Ok(file) => {
+                    let reader = BufReader::new(file);
+                    
+                    for line in reader.lines() {
+                        match line {
+                           
+                            Ok(line) =>  if !line.is_empty(){
+                                println!("{}", line)
+                            },
+                            Err(e) => println!("{}", e),
+                        }
+                    }
+                },
+                Err(e) => println!("{}", e),
+            }
+        },
+        None => println!("none"),
+    }
+
+
+}

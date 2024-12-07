@@ -1,0 +1,52 @@
+1. Donggyu Kim(437008)
+
+2. 
+  |
+1 | use async_std::net::TcpListener;
+  |     ^^^^^^^^^ use of undeclared crate or module `async_std`
+
+3. 
+Hello, world!
+
+4.
+3 | fn main() {
+  |    ---- this is not `async`
+...
+7 |     bind_future.await;
+  |                 ^^^^^ only allowed inside `async` functions and blocks
+
+
+
+5. 
+Ok("Server started")
+
+6.
+"Server started"
+
+7.
+async fn run_server() -> std::io::Result<String> {
+
+    // let connection = match TcpListener::bind("127.0.0.1:7777").await {
+    //     Ok(_) => Ok("Server started".to_string()),
+    //     Err(e) => Err(e),
+    // };
+
+    let listener = TcpListener::bind("127.0.0.1:7777").await?;
+    println!("waiting for connections");
+    let mut new_connections =  listener.incoming();
+    while let Some(socket_result) = new_connections.next().await {
+      
+        let socket = socket_result?;
+        println!("{:?}", socket);
+        
+    };
+   
+    Ok("Done".to_string())
+}
+
+8.
+[donggyukim@iht32-1508.sif debug]$ ./rustasyncserver
+waiting for connections
+
+[donggyukim@iht32-1503.sif debug]$ ./rustasyncclient 
+connection failed
