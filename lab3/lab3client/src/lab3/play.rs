@@ -4,16 +4,13 @@
 use super::declarations::*;
 use std::sync::atomic::Ordering;
 use crate::lab3::scene_fragment::SceneFragment;
+use crate::lab3::script_gen::grab_trimmed_file_lines;
 
-use std::fs::File;
-use std::io::BufReader;
-use std::io::BufRead;
 use std::io::Write;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::thread;
 
-const HAS_ELEMENTS: usize = 0;
 const SCENE_INDEX : usize = 0;
 const TITLE_NAME_INDEX : usize = 1; 
 const CONFIG_FILE_NAME_INDEX : usize = 0;
@@ -23,9 +20,10 @@ const PREV_SCENE_OFFSET : usize = 1;
 const NEXT_SCENE_OFFSET : usize = 1;
 const NO_MORE_TOKENS : usize = 1;
 const SIZE_OFFSET : usize = 1; 
+const PANIC_IN_PROCESS : usize = 4;
+
 
 type ScriptConfig = Vec<(bool, String)>;
-//Instruction 3.
 type Fragments = Vec<Arc<Mutex<SceneFragment>>>;
 
 pub struct Play {
@@ -60,59 +58,17 @@ impl Play {
 
                     self.fragments.push(fragment.clone());
                     
-                    // let latest_fragment_index = self.fragments.len() - 1;
-
-                    //Instruction 5 - Redoing this portion to use thread
-                    // &self.fragments[latest_fragment_index];
                     let cloned_fragment = fragment.clone();
                     let cloned_string = some_string.clone();
 
-                    // let mut output = todo!();
+
                     thread_handles.push(thread::spawn(move || {
                         let result = cloned_fragment.lock().unwrap().prepare(&cloned_string);
                         
                         result
                     }));
 
-                    println!("{}", cloned_fragment.lock().unwrap().play_title);
-                    // thread_handles.push( 
-                    //     thread::spawn(move || {
-                    //         let _ =  cloned_fragment.lock().unwrap().prepare(&cloned_string);
-                    //         // cloned_fragment.lock().unwrap().prepare(&cloned_string);
-
-                    //     }
-                    //     )
-                    // );
-                    // self.fragments.push(output);
-                
-
-                
-                    //This was a little tricky to me because once you push a fragment into self.fragments vector, 
-                    //you cannot access fragment variable since it's moved.
-                    //So I ended up accessing the last element in self.fragments vector 
-                    //to call fragment.prepare()
-
-                    // match self.fragments[latest_fragment_index].lock().unwrap().prepare(some_string) {
-
-                    //     Ok(()) => {
-                    //         // succeed, move on to the next tuple
-                    //     },
-                    //     Err(e) => {
-                    //         let mut writer = std::io::stdout().lock();
-
-                    //         let _ = writeln!(&mut writer,"Script generation failed in SceneFragment::prepare() in Play::process_confing() {}", e);
-                    //         return Err(FAIL_TO_SCRIPT);
-                    //     }
-                    // }
-
-
-                    // let latest_fragment_index = self.fragments.len() - 1;
-                    // //due to the lifetime of self, I ended up cloning the fragment struct to 'move' into a thread
                     
-
-                    // thread_handles.push( 
-                    //     thread::spawn(move || self.fragments[latest_fragment_index].lock().unwrap().prepare(some_string))
-                    //  );
                 }
 
                 
@@ -124,9 +80,7 @@ impl Play {
                 Ok(_) => {} ,
                 Err(_) => println!("{}", "Problem occured in this thread for process_config() in play.rs"),
             };
-        }
-        // self.fragments = thread_handles.into_iter().collect();
-        
+        }    
 
         Ok(())
         
@@ -134,16 +88,16 @@ impl Play {
 
     //This function does sanity check for whether given line indicates a scene or a configuration file used in the scene.
     fn add_config(config_file_line : &String, script_config : &mut ScriptConfig) {
-                          
+
         if config_file_line.trim().is_empty() {
             return;
         }
 
         let tokens : Vec<&str> = config_file_line.split_whitespace().collect();
-       
+
         let mut string_container : String = String::new();
         string_container.push_str("");
-      
+
         //If the a line in the config_file includes [scene] as the first token, it indicates that the line is the title of the fragment, which will be located in the head of the fragments vector
         if tokens[SCENE_INDEX] == "[scene]" {
 
@@ -181,63 +135,20 @@ impl Play {
     //This function reads given configuration file to check which files we need to read to script the entire play
     fn read_config(config_file_name : &String, script_config : &mut ScriptConfig) -> Result<(), u8> {
 
-        let file = match File::open(config_file_name) {
+        let mut config_lines : Vec<String> = Vec::new();
+        let _ =  grab_trimmed_file_lines(config_file_name, &mut config_lines);
 
-            Err(e) => {
-
-                let mut writer = std::io::stdout().lock();
-
-                let _ = writeln!(&mut writer,"File {} cannot be opened : {} in Play::read_config()", config_file_name, e);
-
-                return Err(FAIL_TO_SCRIPT);
-            },
-
-            Ok(file) => file,    
+        //reference : https://stackoverflow.com/questions/38826633/how-to-skip-the-first-n-items-of-an-iterator-in-rust
+        for config_file_line in config_lines.iter(){
+        
+            Self::add_config(config_file_line, script_config);
         };
 
-        
-            //Opens each file
-            let mut bf = BufReader::new(file);
-            let mut line_holder : String = String::new();
+      
 
-            loop {
-                //then reads every line in the text file until End of Line is reached
-                //and pushes each line to vec_lines.
-                line_holder.clear();
 
-                match bf.read_line(&mut line_holder) {
-                        
-                    Ok(val) => {
-                        if val == EOL_VAL {
-                            //success 
-                            break;
-                        } else {
-
-                            let trimmed_line =  line_holder.trim().to_string();
-
-                            //Since we are adding line by line using add_config, instead of adding all trimmed lines to a vector like in lab1,
-                            //add_config does sanity check of inputs into a ScriptConfig, not read_config().
-                            Self::add_config(&trimmed_line, script_config);
-                        }
-                        
-                    },
-                    Err(e) => {
-                        // let mut writer = std::io::stdout().lock();
-
-                        // let result = writeln!(&mut writer,"");
-                        //     match result {
-                        //         Ok(v) => v,
-                        //         Err(e) =>  e,
-                        // }
-                        let mut writer = std::io::stdout().lock();
-
-                        let _ = writeln!(&mut writer,"Script generation has failed in read_config() : {}", e);
-                        return Err(FAIL_TO_SCRIPT)
-                    }
-                }
-            }
-            
         Ok(())
+
     }
 
 
@@ -256,17 +167,11 @@ impl Play {
             },
             Err(e) => {
 
-                // let mut writer = std::io::stdout().lock();
-
-                // let result = writeln!(&mut writer,"");
-                //     match result {
-                //         Ok(v) => v,
-                //         Err(e) => e,
-                // }
                 let mut writer = std::io::stdout().lock();
 
                 let _ = writeln!(&mut writer,"Script generation failed in read_confing() in Play::prepare() : {}", e);
-                return Err(FAIL_TO_SCRIPT);
+                std::panic::panic_any(PANIC_IN_PROCESS);
+            
             },
         };
 
@@ -276,29 +181,17 @@ impl Play {
             },
             Err(e) => {
 
-                // let mut writer = std::io::stdout().lock();
-
-                // let result = writeln!(&mut writer,"");
-                //     match result {
-                //         Ok(v) => v,
-                //         Err(e) =>  e,
-                // }
+            
                 let mut writer = std::io::stdout().lock();
 
                 let _ = writeln!(&mut writer,"Script generation failed in process_config() in Play::prepare() : {}", e);
-                return Err(FAIL_TO_SCRIPT);
+                std::panic::panic_any(PANIC_IN_PROCESS);
+              
             }, 
         };
       
         
-        // if !(self.fragments.len() > HAS_ELEMENTS && !self.fragments[SCENE_INDEX].lock().unwrap().play_title.is_empty()) {
-        //     let mut writer = std::io::stdout().lock();
-
-        //     let _ = writeln!(&mut writer,"Script generation failed in prepare() to check fragments");
-            
-        //     return Err(FAIL_TO_SCRIPT);
-        // } 
-
+      
         Ok(())
 
     }

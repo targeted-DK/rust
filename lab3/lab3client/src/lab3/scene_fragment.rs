@@ -9,7 +9,6 @@ use std::io::Write;
 use std::sync::Mutex;
 use std::sync::Arc;
 use std::thread;
-// use std::cmp::Ordering::*;
 
 const INIT_LINE_NUM : usize = 0;
 const START_COUNTER: usize = 0;
@@ -39,70 +38,40 @@ impl SceneFragment {
     //calls player.prepare() to open file designated for each player of a scene
     pub fn process_config(&mut self, play_config: &PlayConfig) -> Result<(), u8> {
 
-
+     
         let mut thread_handles = vec![];
 
 
         for (part_name, file_name) in play_config {
-            // println!("{}",part_name);
-            // println!("{}",file_name);
-
+   
             let player = Arc::new(Mutex::new(Player::new(part_name.to_string())));
 
-          
+            
             let cloned_player = player.clone();
+            self.players.push(cloned_player);
             let cloned_file_name = file_name.clone();
-     
+
 
             thread_handles.push( 
                 thread::spawn(move || {
-                    let result = cloned_player.lock().unwrap().prepare(&cloned_file_name);
-                    // cloned_fragment.lock().unwrap().prepare(&cloned_string);
-                    result
+
+                    let _ = player.lock().unwrap().prepare(&cloned_file_name);
                 }
                 )
             );
-            
-            // match player.lock().unwrap().prepare(file_name) {
-            //     Ok(()) => {
-                    // succeed, move on 
-                    //I tried not to use clone() but rather use original player variable declared above, but I could not figure out how to bypass this error :
-//         let mut player = Arc::new(Mutex::new(Player::new(part_name.to_string())));
-//    |                 ---------- binding `player` declared here
-//    ...
-//    44 |             match &player.lock().unwrap().prepare(file_name) {
-//       |                    ----------------------
-//       |                    |
-//       |                    borrow of `player` occurs here
-//       |                    a temporary with access to the borrow is created here ...
-//    ...
-//    47 |                     self.players.push(player);
-//       |                                       ^^^^^^ move out of `player` occurs here
-//    ...
-//    56 |             };
-//       |              - ... and the borrow might be used here, when that temporary is dropped and runs the `Drop` code for type `MutexGuard`
-                
-
-            //     //     self.players.push(player.clone());
-            //     // },
-            //     Err(e) => {
-            //         let mut writer = std::io::stdout().lock();
-
-            //         let _ = writeln!(&mut writer,"Failed to prepare player {} , error :{} in SceneFragment::process_config()", file_name, e);
-            //         // println!("Failed to prepare player {} , error :{} in SceneFragment::process_config()", file_name, e);
-            //         return Err(FAIL_TO_SCRIPT);
-            //     }
-            // };
-
             
         }
 
         for handle in thread_handles {
 
-            // handle.join().unwrap();
             match handle.join() {
-                Ok(result) => {} ,
-                Err(_) => println!("{}", "Problem occured in this thread for process_config() in scene_fragment.rs"),
+                Ok(_) => {},
+                Err(e) => {
+
+                    let mut writer = std::io::stdout().lock();
+                    let _ = writeln!(&mut writer,"A thread panicked while joining a thread : {:?}", e);
+                    std::panic::panic_any(PANIC_IN_PROCESS);
+                }
             };
         }
 
@@ -125,7 +94,7 @@ impl SceneFragment {
             }
 
         } else if references.len() >= CONFIG_TOKEN_NUM {
-
+            
             play_config.push((references[CHARACTER_NAME_INDEX].to_string(), references[FILE_NAME_INDEX].to_string()))
         }
 
@@ -136,7 +105,6 @@ impl SceneFragment {
     fn read_config(config_file_name : &String, play_config : &mut PlayConfig) -> Result<(), u8> {
 
         let mut config_lines : Vec<String> = Vec::new();
-        // println!("here in readconfig");
         let _ =  grab_trimmed_file_lines(config_file_name, &mut config_lines);
 
         //reference : https://stackoverflow.com/questions/38826633/how-to-skip-the-first-n-items-of-an-iterator-in-rust
@@ -144,6 +112,8 @@ impl SceneFragment {
         
             Self::add_config(config_file_line, play_config);
         };
+
+      
 
 
         Ok(())
@@ -156,21 +126,17 @@ impl SceneFragment {
         
         match Self::read_config(config_file_name, &mut play_config) {
             Ok(()) => {
-                
+              
             // succeed, move on 
             },
             Err(_) => {
-                // let mut writer = std::io::stdout().lock();
-
-                // let _ = writeln!(&mut writer,"Script generation failed in read_config() in SceneFragment::prepare() : {}", e);
-
+              
                 std::panic::panic_any(PANIC_IN_PROCESS);
 
-                // return Err(FAIL_TO_SCRIPT);
             },
         };        
 
-
+      
         match self.process_config(&play_config){
             Ok(()) => {
             // succeed, move on 
@@ -178,15 +144,11 @@ impl SceneFragment {
             Err(_) => {
 
                 std::panic::panic_any(PANIC_IN_PROCESS);
-                // let mut writer = std::io::stdout().lock();
-                // let _ = writeln!(&mut writer,"Script generation failed in process_config() in SceneFragment::prepare() : {}", e);
-                // return Err(FAIL_TO_SCRIPT);
+               
             }, 
         };
 
         
-    
-        //Instruction 4-3 
         self.players.sort_by(|a, b| compare(a,b));
 
 
@@ -292,17 +254,10 @@ impl SceneFragment {
 
     //All players for the first scene enters
     pub fn enter_all(&self){
-   
-
-        // println!("{}",self.play_title); 
-        // for player in &self.players {
-        //     println!("{}",player.lock().unwrap().character_name);
-        // }
-        
+ 
         println!("{}","");
         if !self.play_title.trim().is_empty(){
             println!("{}", self.play_title);
-
         }
         println!("{}","");    
 
@@ -339,8 +294,6 @@ impl SceneFragment {
     }
 }
 
-
-//Instruction 4-2
 fn compare(first_struct : &Arc<Mutex<Player>>, second_struct : &Arc<Mutex<Player>>) -> std::cmp::Ordering {
     
     let first_lock_result = match first_struct.lock() {

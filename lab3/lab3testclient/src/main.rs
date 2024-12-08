@@ -1,63 +1,86 @@
 //main.rs
 //Author : DK Kim, donggyukim@wustl.edu
-//main file that runs the "lab3testclient" program
-
+//main file that runs the "lab3testclient" program to check is lab3server runs properly
 use std::net::TcpStream;
+use std::io::Write;
+use std::env;
+use std::time::Duration;
+use std::io::BufReader;
+use std::io::BufRead;
 
-const PROG_NAME : u8 = 0;
-const NETWORK_ADDRESS : u8 = 1;
+const NETWORK_ADDRESS : usize = 1;
 const ERROR_CODE : u8 = 1;
-const TOKEN : u8 = 2;
-const MIN_ARGS_FOR_TEST : u8 = 3;
-const ONE_SECOND : u8 = 1;
-const ZERO_SECOND : u8 = 1;
+const TOKEN : usize = 2;
+const MIN_ARGS_FOR_TEST : usize = 3;
+const ONE_SECOND : u64 = 1;
+const ZERO_SECOND : u32 = 1;
 
-//Instruction 12.
-fn main() {
+fn main() -> Result<(), u8> {
 
+    //check number of inputs
     let args: Vec<String> = env::args().collect();
-
     if args.len() != MIN_ARGS_FOR_TEST {
-        usage(&args[PROG_NAME]);
-        return ERROR_CODE;
+        usage();
+        return Err(ERROR_CODE);
 
     }
 
-    let mut program_name = args[PROG_NAME].clone();
-    let mut network_address = args[NETWORK_ADDRESS].clone();
-    let mut token = args[TOKEN].clone();
+    let network_address = args[NETWORK_ADDRESS].clone();
+    let token = args[TOKEN].clone();
+
+    println!("Connecting to: {}", network_address);
+    println!("Token: {}", token);
 
 
+    let mut stream = match TcpStream::connect(&network_address) {
+        Ok(stream) => stream,
+        Err(e) => {
+            eprintln!("Failed to connect to server: {}", e);
+            return Err(ERROR_CODE);
+        }
+    };
 
-    match TcpStream::connect(network_address.clone()) {
-        Ok(stream) => {
-            println!("Connected to the server at {}", network_address);
 
-            stream.write_all(token.as_bytes())?;
-            stream.flush()?;
-
-            if token == "quit" {
-                let one_second_duration = Duration::new(ONE_SECOND, ZERO_SECOND);
-                std::thread::sleep(one_second_duration);
-                TcpStream::connect(network_address.clone());
-                return Ok(());
+            if let Err(e) = stream.write_all(token.as_bytes()) {
+                eprintln!("Token failed to send over server: {}", e);
+                return Err(ERROR_CODE);
             }
-            
-        }
-        Err(_) => {
-            println!("Couldn't connect to server...");
-        }
-    }
 
+        
+
+
+    if token == "quit" {
+        let one_second_duration = Duration::new(ONE_SECOND, ZERO_SECOND);
+        std::thread::sleep(one_second_duration);
+        let _ = TcpStream::connect(network_address.clone());
+
+        return Ok(()); 
+    } else {
+
+
+        let reader = BufReader::new(stream.try_clone().unwrap());
+
+        for line in reader.lines() {
+            match line {
+                Ok(line) => {
+                    println!("Line : {}", line);
+                }
+                Err(e) => {
+                    println!("failed to read line : {}", e);
+                    return Err(ERROR_CODE);
+                }
+            }
+        }
+                                
+        
+        }
+        
+
+    Ok(())
 }
 
-fn usage(prog_name : &String) {
+fn usage() { 
     let mut writer = std::io::stdout().lock();
-
-    //All command line outputs including success and fail depends on match result, instead of providing extra arguments to writeln!()
-    //Very confused since we are getting rid of println! and eprintln! to use writeln!, then what is the point of matching writeln!, which already takes in some error messages..?
-    let _ = writeln!(&mut writer, "test client needs exactly three arguments, which are program name and a network address and a token");
-        // eprintln!("usage: {} <script_file_name>, [whinge]", prog_name);
-
-    // println!("usage: {} <script_file_name>, [whinge]", prog_name);
+    let _ = writeln!(&mut writer, "This test client needs exactly three arguments, which are program name and a network address and a token");
+    let _ = writeln!(&mut writer, "usage: ./lab3testclient <network address>, <token>");
 }

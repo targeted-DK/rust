@@ -2,14 +2,12 @@
 //Author : DK Kim, donggyukim@wustl.edu
 //creates player struct and implements necessary functions.
 use super::declarations::*;
-
 use std::fs::File;
 use std::io::BufReader;
 use std::io::BufRead;
 use std::io::Write;
 use std::sync::atomic::Ordering;
 use std::cmp::Ordering as CmpOrdering;
-
 
 const INDEX_INIT : usize = 0;
 const EMPTY : usize = 0;
@@ -71,19 +69,13 @@ impl Player {
     //this function 'prepares' each player's line by opening a correct file and add each line to a player struct's PlayLines field 
     pub fn prepare(&mut self, file_name : &String) -> Result<(), u8> {
 
-            // println!("{}", file_name);
             let file = match File::open(file_name) {
        
             Err(e) => {
 
                 let mut writer = std::io::stdout().lock();
-
-                //Instruction 5-3
-              
                 let _ = writeln!(&mut writer,"File {} cannot be opened : {}", file_name, e);
-                
                 std::panic::panic_any(PANIC_IN_PROCESS);
-                // return Err(FAIL_TO_SCRIPT);
             },
 
             Ok(file) => file,    
@@ -107,7 +99,7 @@ impl Player {
                             break;
                         } else {
                             let trimmed_line =  line_holder.trim();
-                           
+
                             self.add_script_line(&trimmed_line.to_string());
                         }
                         
@@ -119,12 +111,10 @@ impl Player {
 
                         std::panic::panic_any(PANIC_IN_PROCESS);
 
-                        // return Err(FAIL_TO_SCRIPT)
                     }
                 }
             }
 
-            // println!("{}", self.character_lines.len());
             Ok(())
 
     }

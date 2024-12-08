@@ -24,7 +24,9 @@ fn main() -> ReturnWrapper {
     let args: Vec<String> = env::args().collect();
 
     if args.len() < MIN_ARGS {
+
         usage(&args[PROG_NAME]);
+        
         return ReturnWrapper::new(BAD_ARGS.into());
     }
 
@@ -42,19 +44,15 @@ fn main() -> ReturnWrapper {
     match play.prepare(&config_arg) {
         Ok(()) => {
 
-         
             play.recite();
-            
+        
         },
+
         Err(error) => {
+
             let mut writer = std::io::stdout().lock();
-
             let _ =  writeln!(&mut writer, "Script generation failed in play.prepare() called in main()");
-            // if let Err(e) = writeln!(&mut writer, "main()::play.prepare()"){
-            //     eprintln!("Script generation failed in play.prepare() called in main()");
-            // }
 
-            // println!("Script generation failed in play.prepare() called in main()");
             return ReturnWrapper::new(error.into());
         }
     }
@@ -63,16 +61,9 @@ fn main() -> ReturnWrapper {
 }
 
 fn usage(prog_name : &String) {
+
     let mut writer = std::io::stdout().lock();
-
-    //All command line outputs including success and fail depends on match result, instead of providing extra arguments to writeln!()
-    //Very confused since we are getting rid of println! and eprintln! to use writeln!, then what is the point of matching writeln!, which already takes in some error messages..?
     let _ = writeln!(&mut writer, "usage: {} <script_file_name>, [whinge]", prog_name);
-        // eprintln!("usage: {} <script_file_name>, [whinge]", prog_name);
-
-    
-    
-    // println!("usage: {} <script_file_name>, [whinge]", prog_name);
 }
 
 fn parse_args(config_arg : &mut String) -> Result<(), u8> {
